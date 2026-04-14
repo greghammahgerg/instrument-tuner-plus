@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brass Drift FX Lab</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <div class="ambient ambient-a"></div>
+    <div class="ambient ambient-b"></div>
+
+    <main class="app-card">
+      <nav class="page-nav" aria-label="App navigation">
+        <a class="page-nav-link" href="index.html">Tuner + Drone</a>
+        <a class="page-nav-link is-active" href="fx-lab.html">SC-Inspired FX Lab</a>
+      </nav>
+
+      <section class="hero fx-hero">
+        <div>
+          <p class="eyebrow">Browser Performance Rig</p>
+          <h1>Brass Reactor</h1>
+          <p class="hero-copy">
+            A Web Audio version of your SuperCollider trumpet chain: gated live input, saturation,
+            dry echo, loop record/play, ring modulation, comb wash, recent-buffer chopping, rhythm gating,
+            and a phase sequencer that keeps the texture moving.
+          </p>
+        </div>
+
+        <div class="hero-actions">
+          <button id="bootButton" class="primary-button">Boot Audio Rig</button>
+          <button id="sequenceButton" class="ghost-button">Run Sequence</button>
+          <button id="stopSequenceButton" class="ghost-button">Stop Sequence</button>
+        </div>
+
+        <div class="status-row">
+          <span id="engineBadge" class="pill">Rig offline</span>
+          <span id="phaseBadge" class="pill muted">Phase idle</span>
+          <span id="loopBadge" class="pill muted">Looper stopped</span>
+          <span id="rhythmBadge" class="pill muted">Rhythm off</span>
+          <span class="pill muted">Headphones strongly recommended</span>
+        </div>
+      </section>
+
+      <section class="fx-dashboard">
+        <article class="panel panel-highlight">
+          <div class="panel-heading">
+            <span>Performance Controls</span>
+            <span class="mini-pill">Keys 1 2 3 4 7 8 9</span>
+          </div>
+
+          <div class="looper-grid">
+            <button id="recordButton" class="fx-button fx-button-record">Record (1)</button>
+            <button id="playButton" class="fx-button">Play (2)</button>
+            <button id="clearLoopButton" class="fx-button">Clear Loop (3)</button>
+            <button id="stopAllButton" class="fx-button">Stop All (4)</button>
+          </div>
+
+          <div class="metrics-grid">
+            <div class="metric-box">
+              <span class="metric-label">Current phase</span>
+              <strong id="phaseText">Idle</strong>
+            </div>
+            <div class="metric-box">
+              <span class="metric-label">Output meter</span>
+              <strong id="meterText">-inf dB</strong>
+            </div>
+          </div>
+
+          <div class="meter-shell" aria-hidden="true">
+            <div id="meterFill" class="meter-fill"></div>
+          </div>
+
+          <div class="log-block">
+            <div class="panel-heading compact">
+              <span>Activity Log</span>
+              <span class="subtle-text">Latest events first</span>
+            </div>
+            <div id="activityLog" class="activity-log"></div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-heading">
+            <span>Clock + Master</span>
+            <span id="sequenceBadge" class="mini-pill">Manual mode</span>
+          </div>
+
+          <div class="controls-grid">
+            <label class="control-block">
+              <span>BPM</span>
+              <input id="bpmInput" type="range" min="60" max="180" step="1" value="120">
+              <strong id="bpmValue">120 BPM</strong>
+            </label>
+
+            <label class="control-block">
+              <span>Global FX mix</span>
+              <input id="masterMixSlider" type="range" min="0" max="100" step="1" value="50">
+              <strong id="masterMixValue">50%</strong>
+            </label>
+
+            <label class="control-block">
+              <span>Master HPF</span>
+              <input id="masterHpfSlider" type="range" min="20" max="1200" step="5" value="140">
+              <strong id="masterHpfValue">140 Hz</strong>
+            </label>
+
+            <label class="control-block">
+              <span>Master LPF</span>
+              <input id="masterLpfSlider" type="range" min="400" max="16000" step="10" value="1500">
+              <strong id="masterLpfValue">1500 Hz</strong>
+            </label>
+          </div>
+
+          <div class="tips-block">
+            <p>Sequencer behavior:</p>
+            <p>
+              The browser rig follows the same broad arc as your SuperCollider patch:
+              ring-mod scenes, comb-wash scenes, recent-buffer chopper bursts, chill resets,
+              then back into more aggressive modulation.
+            </p>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-heading">
+            <span>Rhythm Chopper</span>
+            <span class="mini-pill">Placed after FX mix</span>
+          </div>
+
+          <div class="rhythm-grid">
+            <button data-subdiv="2" class="rhythm-button">2s (7)</button>
+            <button data-subdiv="3" class="rhythm-button">3s (8)</button>
+            <button data-subdiv="4" class="rhythm-button">4s (9)</button>
+            <button data-subdiv="0" class="rhythm-button rhythm-button-off">Off</button>
+          </div>
+
+          <div class="metrics-grid">
+            <div class="metric-box">
+              <span class="metric-label">Subdivision</span>
+              <strong id="subdivText">Off</strong>
+            </div>
+            <div class="metric-box">
+              <span class="metric-label">Pulse rate</span>
+              <strong id="pulseRateText">0.00 Hz</strong>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="fx-lab-grid">
+        <article class="panel">
+          <div class="panel-heading">
+            <span>Input Chain</span>
+            <span class="mini-pill">Gate + Saturation + Dry Echo</span>
+          </div>
+
+          <div class="controls-grid">
+            <label class="control-block">
+              <span>Drive</span>
+              <input id="driveSlider" type="range" min="1" max="18" step="0.5" value="10">
+              <strong id="driveValue">10.0</strong>
+            </label>
+
+            <label class="control-block">
+              <span>Echo decay</span>
+              <input id="echoDecaySlider" type="range" min="0.2" max="6" step="0.1" value="2">
+              <strong id="echoDecayValue">2.0 s</strong>
+            </label>
+
+            <label class="control-block">
+              <span>Echo amp</span>
+              <input id="echoAmpSlider" type="range" min="0" max="100" step="1" value="40">
+              <strong id="echoAmpValue">40%</strong>
+            </label>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-heading">
+            <span>Ring Mod Scene</span>
+            <span id="ringState" class="mini-pill">Idle</span>
+          </div>
+
+          <div class="controls-grid">
+            <label class="control-block">
+              <span>Mix</span>
+              <input id="ringMixSlider" type="range" min="0" max="100" step="1" value="80">
+              <strong id="ringMixValue">80%</strong>
+            </label>
+
+            <label class="control-block">
+              <span>Mod frequency</span>
+              <input id="ringFreqSlider" type="range" min="0.2" max="1200" step="0.1" value="2">
+              <strong id="ringFreqValue">2.0 Hz</strong>
+            </label>
+          </div>
+
+          <div class="looper-grid looper-grid-two">
+            <button id="ringToggleButton" class="fx-button">Toggle Ring Mod</button>
+            <button id="sweetRingButton" class="fx-button">Sweet Ring Burst</button>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-heading">
+            <span>Comb Wash</span>
+            <span id="combState" class="mini-pill">Idle</span>
+          </div>
+
+          <div class="controls-grid">
+            <label class="control-block">
+              <span>Delay time</span>
+              <input id="combTimeSlider" type="range" min="0.1" max="0.9" step="0.01" value="0.4">
+              <strong id="combTimeValue">0.40 s</strong>
+            </label>
+
+            <label class="control-block">
+              <span>Decay</span>
+              <input id="combDecaySlider" type="range" min="1" max="16" step="0.5" value="10">
+              <strong id="combDecayValue">10.0 s</strong>
+            </label>
+          </div>
+
+          <div class="looper-grid looper-grid-two">
+            <button id="combToggleButton" class="fx-button">Toggle Comb Wash</button>
+            <button id="combRandomButton" class="fx-button">Randomize Delay</button>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-heading">
+            <span>Pointer Chopper</span>
+            <span id="chopperState" class="mini-pill">Ready</span>
+          </div>
+
+          <div class="controls-grid">
+            <label class="control-block">
+              <span>Window</span>
+              <input id="chopperWindowSlider" type="range" min="0.3" max="4" step="0.1" value="2">
+              <strong id="chopperWindowValue">2.0 s</strong>
+            </label>
+
+            <label class="control-block">
+              <span>Burst density</span>
+              <input id="chopperDensitySlider" type="range" min="1" max="8" step="1" value="3">
+              <strong id="chopperDensityValue">3 voices</strong>
+            </label>
+          </div>
+
+          <div class="looper-grid looper-grid-two">
+            <button id="chopperBurstButton" class="fx-button">Trigger Burst</button>
+            <button id="chopperStormButton" class="fx-button">Storm</button>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script src="fx-lab.js"></script>
+</body>
+</html>
