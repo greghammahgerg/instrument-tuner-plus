@@ -1,6 +1,6 @@
-# Brass Drift
+# Instrumental Tuner Plus
 
-Brass Drift is a dependency-free browser practice app for trumpet players. It listens to your mic, detects stable notes, automatically shifts a drone to follow those notes, and shows a visual tuner against the active center.
+Instrumental Tuner Plus is a dependency-free browser practice app for trumpet players. It listens to your mic, detects stable notes, automatically shifts a drone to follow those notes, and shows a visual tuner against the active center.
 
 The project also includes `fx-lab.html`, a separate browser performance page modeled after the provided SuperCollider trumpet rig with live FX, looping, rhythm chopping, and a phase sequencer.
 
